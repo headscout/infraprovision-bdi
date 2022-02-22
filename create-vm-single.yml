@@ -1,0 +1,36 @@
+---
+- hosts: localhost
+  gather_facts: false
+  connection: localhost
+  vars:
+    vcenter_server: "sr4-vc01.ppc2.local"
+    vcenter_user: "administrator"
+    vcenter_pass: "P@ssw0rd!"
+    cluster_name: "Cluster01"
+  tasks:
+  - name: Create VM Instances
+    vmware_guest:
+      hostname: "{{ vcenter_server }}"
+      username: "{{ vcenter_user }}"
+      password: "{{ vcenter_pass }}"
+      validate_certs: false
+      name: VM_Auto_1
+      datacenter: "{{ datacenter_name }}"
+      folder: '/{{ datacenter_name }}/vm/newCluster'
+      cluster: "{{ cluster_name }}"
+      datastore: "vsanDatastore"
+      networks:
+      - name: VM Networks
+        ip: 10.1.1.221
+        netmask: 255.255.255.0
+        gateway: 10.1.1.2
+        type: static
+        dns_server: 10.1.1.2
+      customization:
+        hostname: "WebIIS02"
+        dns_server:
+        - 10.1.1.2
+        - 1.1.1.1
+      state: poweredon
+      wait_for_ip_address: yes
+    delegate_to: localhost
